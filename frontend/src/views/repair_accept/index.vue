@@ -55,6 +55,7 @@
             >
               {{ action }}
             </button>
+            <button class="link" type="button" @click="downloadPack(row)">下载会签包</button>
           </td>
         </tr>
         <tr v-if="!rows.length">
@@ -62,6 +63,66 @@
         </tr>
       </tbody>
     </table>
+
+    <section class="panel">
+      <h3>会签资料包</h3>
+      <p class="panel-desc">
+        下载资料包（含验收编号、关联维修、维修质量、复修要求）供现场离线填写，上传后系统逐条校验并给出通过、退回或待补充结论；
+        重复上传与版本冲突不会生成第二份验收记录，旧版本材料按历史口径保留。
+      </p>
+      <div class="upload-line">
+        <input ref="fileInput" type="file" accept=".json,application/json" @change="onPackageFile" />
+        <button class="btn primary" type="button" :disabled="!packageFile" @click="submitPackage">
+          上传会签资料包
+        </button>
+      </div>
+      <div v-if="uploadResult" class="upload-result">
+        <p class="conclusion" :class="uploadResult.ok ? 'result-ok' : 'result-bad'">
+          校验结论：{{ uploadResult.结论 }} — {{ uploadResult.message }}
+        </p>
+        <table v-if="uploadResult.items.length" class="data-table">
+          <thead>
+            <tr><th>条目</th><th>校验结果</th><th>原因</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in uploadResult.items" :key="item.条目">
+              <td>{{ item.条目 }}</td>
+              <td>{{ item.结果 }}</td>
+              <td>{{ item.原因 || '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>包编号</th>
+            <th>验收编号</th>
+            <th>版本</th>
+            <th>包状态</th>
+            <th>校验结果</th>
+            <th>失败条目及原因</th>
+            <th>上传人</th>
+            <th>上传时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="pkg in packages" :key="String(pkg.id)">
+            <td>{{ pkg['包编号'] }}</td>
+            <td>{{ pkg['验收编号'] || '—' }}</td>
+            <td>{{ pkg['版本'] ?? '—' }}</td>
+            <td>{{ pkg.status }}</td>
+            <td>{{ pkg['校验结果'] || '—' }}</td>
+            <td>{{ pkg['失败条目'] || '—' }}</td>
+            <td>{{ pkg['上传人'] || '—' }}</td>
+            <td>{{ pkg['上传时间'] || '—' }}</td>
+          </tr>
+          <tr v-if="!packages.length">
+            <td colspan="8" class="empty-state">暂无会签资料包记录，可先在列表里下载会签包</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
 
     <footer class="page-foot">
       <span>共 {{ total }} 条维修验收记录</span>
@@ -79,7 +140,14 @@ import {
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
+import {
+  downloadPackage,
+  listPackages,
+  uploadPackage,
+  type PackageUploadResult,
+} from '@/api/countersign'
 import type { EntryRow } from '@/data/types'
+import { useSessionStore } from '@/stores/session'
 
 const meta = moduleMeta('repair_accept')
 const columns = ["验收编号", "关联维修", "验收人员", "验收日期", "维修质量", "验收结论", "复修要求", "验收状态"]
@@ -87,10 +155,15 @@ const actions = ["发起验收", "确认通过", "退回返修"]
 const statuses = ["待验收", "验收中", "已通过", "需返修"]
 const stats = [{"label": "待验收记录", "value": 0}, {"label": "已通过记录", "value": 0}, {"label": "需返修记录", "value": 0}]
 
+const store = useSessionStore()
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
 const errorMessage = ref('')
 const filters = ref<Record<string, string>>({})
+const packages = ref<EntryRow[]>([])
+const packageFile = ref<File | null>(null)
+const fileInput = ref<HTMLInputElement | null>(null)
+const uploadResult = ref<PackageUploadResult | null>(null)
 const filterFields = columns.slice(0, 3)
 const statusSummary = computed(() =>
   statuses.map((status: string) => ({
@@ -122,6 +195,34 @@ function runAction(action: string, row: EntryRow) {
   reload()
 }
 
+function downloadPack(row: EntryRow) {
+  downloadPackage(row)
+}
+
+function onPackageFile(event: Event) {
+  const input = event.target as HTMLInputElement
+  packageFile.value = input.files?.[0] ?? null
+}
+
+async function submitPackage() {
+  if (!packageFile.value) {
+    return
+  }
+  errorMessage.value = ''
+  const text = await packageFile.value.text()
+  uploadResult.value = uploadPackage(text, store.operator)
+  packageFile.value = null
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+  reload()
+  reloadPackages()
+}
+
+function reloadPackages() {
+  packages.value = listPackages()
+}
+
 function reload() {
   errorMessage.value = ''
   try {
@@ -133,5 +234,8 @@ function reload() {
   }
 }
 
-onMounted(reload)
+onMounted(() => {
+  reload()
+  reloadPackages()
+})
 </script>

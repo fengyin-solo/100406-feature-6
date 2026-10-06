@@ -1,3 +1,4 @@
+import { reopenReworkForAcceptance } from '@/api/countersign'
 import { MODULE_BY_KEY } from '@/data/modules'
 import { allRows, listRows, resetRows, saveRows } from '@/data/local-store'
 import type { ActionResult, EntryRow, ModuleMeta, OverviewResult, PageResult } from '@/data/types'
@@ -53,7 +54,14 @@ export function runAction(key: string, id: number, action: string): ActionResult
   const next = [...rows]
   next[index] = updated
   saveRows(key, next)
-  return { ok: true, message: `${meta.entity}已${action}，当前状态「${target}」` }
+  let message = `${meta.entity}已${action}，当前状态「${target}」`
+  if (key === 'repair_accept' && target === '需返修') {
+    const dispatchId = reopenReworkForAcceptance(updated)
+    if (dispatchId) {
+      message += `，外出维修 ${dispatchId} 已重开返修事项`
+    }
+  }
+  return { ok: true, message }
 }
 
 export function resetModule(key: string): PageResult {

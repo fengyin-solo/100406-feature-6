@@ -24,6 +24,11 @@
       </span>
     </p>
 
+    <p v-if="reworkRows.length" class="rework-banner">
+      验收退回重开的返修事项：
+      {{ reworkRows.map((row) => `${row['派遣编号']}（${row['返修说明']}）`).join('、') }}
+    </p>
+
     <form class="filter-bar" @submit.prevent="reload">
       <label v-for="field in filterFields" :key="field" class="filter-item">
         <span>{{ field }}</span>
@@ -97,6 +102,9 @@ const statusSummary = computed(() =>
     status,
     count: rows.value.filter((row) => String(row.status) === status).length,
   })),
+)
+const reworkRows = computed(() =>
+  rows.value.filter((row) => String(row['返修说明'] ?? '') !== ''),
 )
 
 function resetFilters() {
