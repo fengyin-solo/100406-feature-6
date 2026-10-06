@@ -35,3 +35,46 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .error-text { color: #b42318; }
 .status-legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 10px; font-size: 12px; color: var(--muted); }
 .legend-item { background: #eef2f7; border-radius: 999px; padding: 2px 10px; }
+.legend-alert { background: #fee4e2; color: #b42318; }
+.hidden-file { display: none; }
+.muted-text { color: var(--muted); font-size: 12px; }
+.ok-text { color: #067647; font-size: 12px; }
+.version-mark { background: #eef2f7; border-radius: 4px; padding: 0 6px; font-size: 12px; margin-left: 4px; }
+.link.danger { color: #b42318; }
+.col-check { width: 36px; text-align: center; }
+
+.pkg-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
+.pkg-tip { color: var(--muted); font-size: 12px; }
+.btn.small { padding: 2px 8px; font-size: 12px; margin-left: auto; }
+
+.tag { display: inline-block; border-radius: 999px; padding: 1px 10px; font-size: 12px; white-space: nowrap; }
+.tag-pass, .tag-passed { background: #dcfae6; color: #067647; }
+.tag-return, .tag-returned { background: #fee4e2; color: #b42318; }
+.tag-supplement { background: #fef0c7; color: #b54708; }
+.tag-reject, .tag-conflict, .tag-structure, .tag-invalid { background: #f2f4f7; color: #344054; border: 1px solid var(--border); }
+.tag-duplicate { background: #eaecf0; color: #475467; }
+
+.result-panel { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; background: #fff; }
+.result-panel.is-pass { border-color: #75d0a3; background: #f3fdf7; }
+.result-panel.is-fail { border-color: #f2a29e; background: #fffbfa; }
+.result-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+.result-table { margin-top: 8px; }
+.reason-list { margin: 0; padding-left: 16px; color: #b54708; font-size: 12px; }
+
+.history-panel { margin-top: 16px; }
+.history-panel h3 { font-size: 14px; margin: 0 0 4px; }
+.history-item { background: #fff; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; padding: 6px 12px; }
+.history-item summary { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; }
+.history-message { color: var(--muted); font-size: 12px; margin: 6px 0; }
+
+.rework-banner { background: #fffbfa; border: 1px solid #f2a29e; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px; }
+.rework-banner strong { color: #b42318; }
+.rework-list { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.rework-requirement { color: #344054; font-size: 12px; margin-top: 2px; }
+tr.row-rework { background: #fff7f6; }
+
+.modal-mask { position: fixed; inset: 0; background: rgba(16, 24, 40, 0.45); display: flex; align-items: center; justify-content: center; z-index: 20; }
+.modal-box { background: #fff; border-radius: 10px; padding: 18px 20px; width: 460px; max-width: calc(100vw - 32px); }
+.modal-box h3 { margin: 0 0 6px; font-size: 15px; }
+.modal-box textarea { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 8px; font: inherit; resize: vertical; margin-top: 4px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
